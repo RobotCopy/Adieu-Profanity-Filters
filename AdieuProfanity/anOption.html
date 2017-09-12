@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Advanced Profanity Filter</title>
+  <link rel="stylesheet" type="text/css" href="anOption.css" />
+</head>
+
+<body>
+	<div id="options">
+		<h3>Interface:</h3>
+		<div>
+		  <input type="checkbox" id="showCounter">
+		  <label for="showCounter">Show number of filtered words</label>
+		</div>
+
+		<div>
+			<label>
+			  <input type="checkbox" id="consoleOutput">
+			  Show console output
+			</label>
+		</div>
+
+		<div>
+			<label>
+				Minimum words per category
+				<input type="text" id="minWordsPerCategory" size="2">
+			</label>
+		</div>
+
+		<h3>Words mask style:</h3>
+		<ul class="replacerString">
+			<li class="replacer">
+				<input type="radio" name="replacer" value="8" id="val9"> 
+				<label for="val9">Why is this word bad?</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="9" id="val10"> 
+				<label for="val10">Hide sentence characters</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="0" id="val1" checked="checked"> 
+				<label for="val1">&#35;&#36;&#38;&#37;&#35;</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="1" id="val2"> 
+				<label for="val2">********</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="2" id="val3"> 
+				<label for="val3">Censored</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="3" id="val4"> 
+				<label for="val4">Safe words</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="4" id="val5"> 
+				<label for="val5">TV words</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="5" id="val6"> 
+				<label for="val6">"Funny" words</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="6" id="val7"> 
+				<label for="val7">Type of words</label>
+			</li>
+			<li class="replacer">
+				<input type="radio" name="replacer" value="7" id="val8"> 
+				<label for="val8">Klingon</label>
+			</li>
+		</ul>
+		<!--input type="hidden" value="test,testing" id="profanityList">
+		<input type="hidden" value="antitest,antitesting" id="exceptionList"-->
+		
+		<h3>Word options:</h3>
+		<div>
+		  <input type="checkbox" id="hideSentence">
+		  <label for="hideSentence">Hide complete sentence</label>
+		  <input type="text" id="hideSentenceMark" size="2">
+		</div>
+		
+		<div style="display: none;">
+		  <input type="checkbox" id="preserveFirst">
+		  <label for="preserveFirst">Preserve the first letter</label>
+		</div>
+
+		<div>
+			<label>
+			  <input type="checkbox" id="filterExtreme">
+			  Filter replacements of letters with numbers and repeated vocals
+			</label>
+		</div>
+		
+		<div>
+			<label>
+			  <input type="checkbox" id="checkTextInImage">
+			  Check words in attributes of image tags
+			</label>
+		</div>
+		
+
+	</div>
+  
+   
+  
+  
+	<div id="profanityButton">
+		<button id="toggleProfanity">Modify Profanity List</button>
+		<div id="listWarning" class="notes">Warning: Offensive Language</div>
+	</div>
+
+	<div id="profanityListing" style="display: none;">
+		<h3>Words censored:</h3>
+		
+		<!--div>Complete words</div>
+		<div class="notes">Comma separated values with no spaces</div>
+		<textarea id="wordListComplete" cols="40" rows="5"></textarea-->
+	  
+		<!--div>Nested words</div>
+		<div class="notes">Comma separated values with no spaces</div>
+		<textarea id="wordListNested" cols="40" rows="5"></textarea-->
+
+		<div>Exceptions</div>
+		<div class="notes">Comma separated values with no spaces</div>
+		<textarea id="wordListExceptions" cols="40" rows="3"></textarea>
+		
+		<table class="BWtable">
+			<tr>
+				<td colspan="2">GREEN RATING</td>
+			</tr>
+			<tr>
+				<td colspan="2">Custom Words</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="customComplete"></textarea></td>
+				<td><textarea id="customNested"></textarea></td>
+			</tr>
+		</table>
+	
+		<table class="BWtable">
+			<tr>
+				<td colspan="2">YELLOW RATING</td>
+			</tr>
+			<tr>
+				<td colspan="2">Triumphalism</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="triumphalismNested"></textarea></td>
+				<td><textarea id="triumphalismComplete"></textarea></td>
+			</tr>
+			<tr>
+			<tr>
+				<td colspan="2">Isolationism</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="isolationismNested"></textarea></td>
+				<td><textarea id="isolationismComplete"></textarea></td>
+			</tr>
+			<td colspan="2">Elitism</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="elitismNested"></textarea></td>
+				<td><textarea id="elitismComplete"></textarea></td>
+			</tr>
+			
+			
+			
+			<tr>
+				<td colspan="2">Nudity</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="nudityNested"></textarea></td>
+				<td><textarea id="nudityComplete"></textarea></td>
+			</tr>
+			
+			
+			
+			<tr>
+				<td colspan="2">Curse</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="curseNested"></textarea></td>
+				<td><textarea id="curseComplete"></textarea></td>
+			</tr>
+		</table>
+		
+		<table class="BWtable">
+			<tr>
+				<td colspan="2">ORANGE RATING</td>
+			</tr>
+			<tr>
+				<td colspan="2">Degrading</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="degradingNested"></textarea></td>
+				<td><textarea id="degradingComplete"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="2">Humiliating</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="humiliatingNested"></textarea></td>
+				<td><textarea id="humiliatingComplete"></textarea></td>
+			</tr>
+			
+			<tr>
+				<td colspan="2">Arrogance</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="arroganceNested"></textarea></td>
+				<td><textarea id="arroganceComplete"></textarea></td>
+			</tr>
+			
+			
+			
+			<tr>
+				<td colspan="2">Immodesty</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="immodestyNested"></textarea></td>
+				<td><textarea id="immodestyComplete"></textarea></td>
+			</tr>
+		</table>
+		
+		<table class="BWtable">
+			<tr>
+				<td colspan="2">RED RATING</td>
+			</tr>
+			<tr>
+				<td colspan="2">Blasphemy</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="blasphemyNested"></textarea></td>
+				<td><textarea id="blasphemyComplete"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="2">Sexism</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="sexismNested"></textarea></td>
+				<td><textarea id="sexismComplete"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="2">Racism</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="racismNested"></textarea></td>
+				<td><textarea id="racismComplete"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="2">Homophobia</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="homophobiaNested"></textarea></td>
+				<td><textarea id="homophobiaComplete"></textarea></td>
+			</tr>
+			
+			
+			
+			<tr>
+				<td colspan="2">Drugs</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="drugsNested"></textarea></td>
+				<td><textarea id="drugsComplete"></textarea></td>
+			</tr>
+			
+			
+			
+			<tr>
+				<td colspan="2">Explicit</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="explicitNested"></textarea></td>
+				<td><textarea id="explicitComplete"></textarea></td>
+			</tr>
+			
+			
+			
+			<tr>
+				<td colspan="2">Bullying</td>
+			</tr>
+			<tr>
+				<td>Complete words</td>
+				<td>Nested words</td>
+			</tr>
+			<tr>
+				<td><textarea id="bullyingNested"></textarea></td>
+				<td><textarea id="bullyingComplete"></textarea></td>
+			</tr>
+		</table>
+	
+		<button id="save">Save List</button>
+	</div>
+
+	<div id="status"></div>
+  
+	<button id="default">Restore Defaults</button>
+	<span id="contributors">
+		Created By Luis Huancapaza.
+		Based off of <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a>, Based off of markyd13's Simple Profanity Filter
+	</span>
+
+	<script src="anOption.js"></script>
+</body>
+</html>

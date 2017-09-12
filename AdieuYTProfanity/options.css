@@ -1,0 +1,89 @@
+.hidden{
+	display:none;
+}
+
+a:link, a:visited {
+  color: gray;
+  font-size: 12px;
+}
+
+a:hover, a:active {
+  color: #393939;
+  font-size: 12px;
+}
+
+.BWtable{
+	margin-top:10px;
+	padding-top:10px;
+	width:100%;
+}
+
+.ProfanityDetails{
+	margin-top:5px;
+	padding-top:5px;
+	padding-bottom:5px;
+}
+
+textarea {
+  width:100%;
+}
+
+label input[type=checkbox]{
+  position: relative;
+  vertical-align: middle;
+  bottom: 1px;
+}
+
+#save {
+  float: right;
+  margin-right: 0;
+}
+
+.notes {
+  padding-top: 5px;
+  font-size: 12px;
+  color: gray;
+}
+
+.examples {
+  padding-bottom: 5px;
+  padding-left: 0px;
+  font-size: 12px;
+  color: gray; 
+}
+
+#options {
+  padding: 2px 0;
+}
+
+#status {
+  height: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: green;
+}
+
+#status.error {
+  color: red;
+}
+
+#default {
+  margin: 2px 0 0 0;
+  float: right;
+}
+
+#contributors {
+  font-style: italic;
+  font-size: 12px;
+  line-height: 14px;
+  display: inline;
+  color: gray;
+}
+
+.replacerString{
+	list-style: none;
+}
+
+.replacer{
+	list-style: none;
+}

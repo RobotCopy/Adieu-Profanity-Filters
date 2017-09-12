@@ -1,0 +1,59 @@
+{
+  "update_url": "https://clients2.google.com/service/update2/crx",
+  
+  "name": "Adieu YouTube Profanity Filter",
+  "short_name": "Adieu YT Profanity Filter",
+  "author": "Luis Huancapaza",
+  "manifest_version": 2,
+  "version": "0.1.2",
+  "description": "Intended to filter profanities from videos.",
+  "icons": {
+    "16": "icons/icon16_green.png",
+    "48": "icons/icon48_green.png",
+    "128": "icons/icon128_green.png"
+  },
+  "permissions": [
+	"activeTab",
+    "*://*.youtube.com/*",
+    "tabs",
+    "storage",
+	"webNavigation",
+    "contextMenus"
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+  "background": {
+	"persistent": true,
+    "scripts": ["eventPage.js"]
+  },
+  "browser_action": {
+    "default_icon": {
+      "19": "icons/icon19_gray.png",
+      "38": "icons/icon38_gray.png"
+    },
+    "default_title": "Adieu YouTube Profanity Filter"
+  },
+  "web_accessible_resources": [
+	"img/null.png",
+	"icons/icon19_green.png",
+    "icons/icon38_green.png",
+	"icons/icon19_gray.png",
+    "icons/icon38_gray.png",
+	"icons/icon19_red.png",
+    "icons/icon38_red.png",
+	"icons/icon19_orange.png",
+    "icons/icon38_orange.png",
+	"icons/icon19_yellow.png",
+    "icons/icon38_yellow.png"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["filter.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ]
+}

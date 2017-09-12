@@ -1,0 +1,59 @@
+{
+  "update_url": "https://clients2.google.com/service/update2/crx",
+
+  "name": "Adieu Profanity Filter",
+  "short_name": "Adieu Profanity",
+  "author": "Luis Huancapaza",
+  "manifest_version": 2,
+  "version": "0.1.2",
+  "description": "It is intended to Filter profanities, curses and bad words.",
+  "icons": {
+    "16": "icons/icon16_green.png",
+    "48": "icons/icon48_green.png",
+    "128": "icons/icon128_green.png"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+	"<all_urls>",
+	"webNavigation",
+	
+	"contextMenus",
+	"activeTab"
+  ],
+  "options_ui": {
+    "page": "anOption.html",
+    "chrome_style": true
+  },
+  "background": {
+    "scripts": ["anEventPage.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_icon": {
+      "19": "icons/icon19_green.png",
+      "38": "icons/icon38_green.png"
+    },
+    "default_title": "Adieu Profanity Filter"
+  },
+  "web_accessible_resources": [
+	"img/null.png",
+	"icons/icon19_red.png",
+    "icons/icon38_red.png",
+	"icons/icon19_orange.png",
+    "icons/icon38_orange.png",
+	"icons/icon19_yellow.png",
+    "icons/icon38_yellow.png",
+	"icons/icon19_green.png",
+    "icons/icon38_green.png"
+  ],
+  "content_scripts": [
+    {
+      "matches":["<all_urls>"],
+      "js": ["aFilter.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ]
+}
+

@@ -1,0 +1,52 @@
+"This is a test".replace(
+	new RegExp(
+		"(\\b(of|the|a|an)\\s+)(t)est(\\w*\\b)","gi"
+	)
+)
+
+
+
+function caesarShift(str, firstlet){
+	var amount=13;
+	var output='';
+	var prevChar="";
+	for (var i = 0; i < str.length; i ++) {
+		var c = str[i];
+		
+		if((prevChar=="\\")&&(c=="b"||c=="w")){ // experimental to accept \\b as regex
+			prevChar="";
+		}else{
+			if(c=="\\") prevChar=c;
+			else prevChar="";
+			
+			if (c.match(/[a-z]/i)) {
+				var code = str.charCodeAt(i);
+				if ((code >= 65) && (code <= 90))
+					c = String.fromCharCode(((code - 65 + amount) % 26) + 65);
+
+				else if ((code >= 97) && (code <= 122))
+					c = String.fromCharCode(((code - 97 + amount) % 26) + 97);
+
+			}
+		}
+		output += c;
+	}
+	return output;
+}
+
+
+
+caesarShift("This is a test","")
+"Guvf vf n grfg"
+tmpString="This is a test".replace(new RegExp("(\\b(of|the|a|an)\\s+)?"+profanityList[z].slice(2),'gi'),caesarShift);
+VM514:2 Uncaught ReferenceError: profanityList is not defined(…)(anonymous function) @ VM514:2InjectedScript._evaluateOn @ (program):878InjectedScript._evaluateAndWrap @ (program):811InjectedScript.evaluate @ (program):667
+
+tmpString="This is a test".replace(new RegExp("(\\b(of|the|a|an)\\s+)?"+"(\\w?)\\w*(i)s\\w*\\b",'gi'),caesarShift);
+
+>"Guvf vf a test"
+
+"Guvf vf a test".replace(RegExp("(\\b("+caesarShift("of|the|a|an","")+")\\s+)?"+caesarShift("(\\w?)\\w*(i)s\\w*\\b",''),'gi'),"[x]")
+
+>/(\b(bs|gur|n|na)\s+)?(\j?)\j*(v)f\j*\b/gi
+
+RegExp("\\b(\\w?)\\w*(i)s\\w*\\b").test("this is a test")
