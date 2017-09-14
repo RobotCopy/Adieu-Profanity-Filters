@@ -2,8 +2,6 @@
 
 Experimental filters for Text and for Youtube.
 
-It was made for personal use.
-
 Based on idea by Richard Frost, markyd13 and atechdad : Advanced Profanity Filter, YouTube Profanity Filter, Simple Profanity Filter, 
 	
 Adieu Youtube Profanity Filter: 
@@ -27,4 +25,4 @@ Adieu Profanity Filter:
 - It works in local files.
 - Default list of profanities.
 
-PS. I don't have the resources, so I will not be able to upload it to the Chrome Store.
+PS. It was made for personal use and I don't have the resources, so I will not be able to upload it to the Chrome Store.
