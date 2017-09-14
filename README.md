@@ -21,4 +21,4 @@ Adieu Profanity Filter:
 - It filters images by titles.
 - Different default options to replace bad words.
 
-PS. I don't have the resources so it would not be uploaded to the Chrome Store so here it is.
+PS. I don't have the resources so it would not be uploaded to the Chrome Store.
