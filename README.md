@@ -10,7 +10,7 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 - Categorization of bad words.
 - Categorization of videos (icon colors - loosely based in movie classifications).
 - Options to mute or jump profanities in videos.
-- Show graphically location of bad words in the progress bar of videos.
+- Show location of bad words in the progress bar of videos.
 
 Adieu Profanity Filter:
 
