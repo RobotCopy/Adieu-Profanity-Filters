@@ -11,6 +11,7 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 - Categorization of videos (icon colors - loosely based in movie classifications).
 - Options to mute or jump profanities in videos.
 - Show location of bad words in the progress bar of videos.
+- Default list of profanities.
 
 Adieu Profanity Filter:
 
@@ -20,5 +21,8 @@ Adieu Profanity Filter:
 - infixes, whole words and modified words.
 - It filters images by titles.
 - Different default options to replace bad words.
+- It hide sentences with Profanities.
+- It works in local files.
+- Default list of profanities.
 
-PS. I don't have the resources so it would not be uploaded to the Chrome Store.
+PS. I don't have the resources, so I will not be able to upload it to the Chrome Store.
