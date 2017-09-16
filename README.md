@@ -1,4 +1,4 @@
-# Adieu
+# Adieu - Extensions for Chrome.
 
 Experimental filters for Text and for Youtube.
 
