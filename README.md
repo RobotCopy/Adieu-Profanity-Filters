@@ -19,6 +19,11 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 **Profanities**
 - Default list of profanities.
 
+**More Features**
+- Option to show number of filtered words
+- Option to show console output
+
+
 ### Adieu Profanity Filter:
 
 **Categorization**
@@ -49,7 +54,9 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 - Right click menu to add whole words and infixes.
 - Custom made options for Youtube, Reddit and Twitter.
 
-**More Options**
+**More Features**
 - It works with local files.
+- Option to show number of filtered words
+- Option to show console output
 
-PS. It was made for personal use and I don't have the resources, so I will not be able to upload it to the Chrome Store.
+**PS.** It was made for personal use and I don't have the resources, so I will not be able to upload it to the Chrome Store.
