@@ -4,7 +4,7 @@ Experimental filters for Text and for Youtube.
 
 Based on idea by Richard Frost, markyd13 and atechdad : Advanced Profanity Filter, YouTube Profanity Filter, Simple Profanity Filter, 
 	
-### Adieu Youtube Profanity Filter: 
+## Adieu Youtube Profanity Filter: 
 This extension mute profanities in YouTube. Closed Captions must be available for the video.
 
 **Categorization**
@@ -24,7 +24,7 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 - Option to show console output
 
 
-### Adieu Profanity Filter:
+## Adieu Profanity Filter:
 
 **Categorization**
 - Categorization of pages (icon colors - loosely based in movie classifications).
