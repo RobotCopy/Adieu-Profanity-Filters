@@ -60,3 +60,7 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 - Option to show console output.
 
 **PS.** It was made for personal use and I don't have the resources, so I will not be able to upload it to the Chrome Store.
+
+# How to Install
+Please follow the instructions in the next link:
+- https://blog.hunter.io/install-chrome-extension-manually/
