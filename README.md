@@ -60,17 +60,3 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 - Option to show console output.
 
 **PS.** It was made for personal use and I don't have the resources, so I will not be able to upload it to the Chrome Store.
-
-  * Klingon
-
-**Profanities**
-- Default list of profanities.
-- Right click menu to add whole words and infixes.
-- Custom made options for Youtube, Reddit and Twitter.
-
-**More Features**
-- It works with local files.
-- Option to show number of filtered words
-- Option to show console output
-
-**PS.** It was made for personal use and I don't have the resources, so I will not be able to upload it to the Chrome Store.
