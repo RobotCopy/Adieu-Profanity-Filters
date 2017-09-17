@@ -37,7 +37,7 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 - Option to filter images by titles.
 
 **Replacement**
-- Different default options to replace bad words.
+- Different options to replace bad words.
   * Why is this word bad?.
   * Hide sentence characters.
   * Symbols.
