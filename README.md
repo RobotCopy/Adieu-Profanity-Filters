@@ -34,7 +34,7 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
 - Option to hide complete sentences.
 - It hides infixes, whole words and modified words (numbers or symbols for vocals).
 - It hides adjectives and prepositions in addition to the original profanity.
-- Option to filter images by titles.
+- Option to filter images by title.
 
 **Replacement**
 - Different options to replace bad words.
@@ -47,6 +47,20 @@ This extension mute profanities in YouTube. Closed Captions must be available fo
   * TV words
   * "Funny" words
   * Classification of words
+  * Klingon
+
+**Profanities**
+- Default list of profanities.
+- Right click menu to add whole words and infixes.
+- Custom made options for Youtube, Reddit and Twitter.
+
+**More Features**
+- It works with local files.
+- Option to show number of filtered words.
+- Option to show console output.
+
+**PS.** It was made for personal use and I don't have the resources, so I will not be able to upload it to the Chrome Store.
+
   * Klingon
 
 **Profanities**
