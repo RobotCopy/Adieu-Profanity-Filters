@@ -534,7 +534,7 @@ function restore_options() {
 		for (var i = 0, len = replacers.length; i < len; i++)
 			replacers[i].checked = false;
 
-		var field = document.getElementById('val' + (parseInt(settings.profanityString)+<1));
+		var field = document.getElementById('val' + (parseInt(settings.profanityString)+1));
 		if (field) field.checked = true;
 		else this.elements.replacers[3].checked = true;
 		
