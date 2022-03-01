@@ -131,7 +131,6 @@ function validateTextArea(text){
 
 function storeWord(contextWord,typeOfWord){
 	var i,flgRepeated=false;
-	var tempList=[];
 	var defaults={
 		//Complete
 		"curseComplete":"[]","humiliatingComplete":"[]","degradingComplete":"","blasphemyComplete":"","sexismComplete":"[]","racismComplete":"[]","homophobiaComplete":"[]","explicitComplete":"[]","immodestyComplete":"[]","nudityComplete":"[]","triumphalismComplete":"[]","elitismComplete":"[]","arroganceComplete":"[]","isolationismComplete":"[]","bullyingComplete":"[]","drugsComplete":"[]",
@@ -159,190 +158,36 @@ function storeWord(contextWord,typeOfWord){
 		'profanityList':['']
 	};
 	
+	const keys = [
+		"triumphalism", "isolationism", "elitism", "nudity", "curse", "degrading", "humiliating", "arrogance", "immodesty",
+		"blasphemy", "sexism", "racism", "homophobia", "drugs", "explicit", "bullying",
+		"custom",
+	];
+
 	chrome.storage.sync.get(defaults,function(settings){
 		if(typeOfWord=="complete"){
-			if(!flgRepeated){
-				tempList=settings.triumphalismComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.isolationismComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.elitismComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.nudityComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.curseComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.degradingComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.humiliatingComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.arroganceComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.immodestyComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.blasphemyComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.sexismComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.racismComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.homophobiaComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.drugsComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.explicitComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.bullyingComplete.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.customComplete.split(',');
-				for(i=0;i<tempList.length;i++){
-					console.log("customComplete: "+tempList[i]);
-					if(tempList[i]==contextWord) flgRepeated=true;
+			// v-changed (old did not use loop!)
+			for (const key of keys) {
+				const tempList=settings[key + "Complete"].split(',');
+				if (tempList.includes(contextWord)) {
+					flgRepeated = true;
+					break;
 				}
 			}
 		}else if(typeOfWord=="nested"){
-			if(!flgRepeated){ 
-				tempList=settings.triumphalismNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.isolationismNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.elitismNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.nudityNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.curseNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.degradingNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.humiliatingNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.arroganceNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.immodestyNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.blasphemyNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.sexismNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.racismNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.homophobiaNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.drugsNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.explicitNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.bullyingNested.split(',');
-				for(i=0;i<tempList.length;i++)
-					if(tempList[i]==contextWord) flgRepeated=true;
-			}
-			if(!flgRepeated){
-				tempList=settings.customNested.split(',');
-				for(i=0;i<tempList.length;i++){
-					//console.log("customNested: "+tempList[i]);
-					if(tempList[i]==contextWord) flgRepeated=true;
+			// v-changed (old did not use loop!)
+			for (const key of keys) {
+				const tempList=settings[key + "Nested"].split(',');
+				if (tempList.includes(contextWord)) {
+					flgRepeated = true;
+					break;
 				}
 			}
 		}else if(typeOfWord=="exception"){
-			if(!flgRepeated){
-				tempList=settings.wordListExceptions.split(',');
-				for(i=0;i<tempList.length;i++){
-					//console.log("customNested: "+tempList[i]);
-					if(tempList[i]==contextWord) flgRepeated=true;
-				}
+			// v-changed
+			const tempList=settings.wordListExceptions.split(',');
+			if (tempList.includes(contextWord)) {
+				flgRepeated=true;
 			}
 		}
 		

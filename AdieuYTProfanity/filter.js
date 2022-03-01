@@ -1,6 +1,10 @@
+// v-added (along with several usages)
+const squareStyleExtras = "pointer-events:none;";
+
 // Default time options: (1.5,-0.75,2)<-(1.5,-1.5,0.75)
 var toMute,showCounter,consoleOutput,delay,minPerCategory;
 var cycleTime,muteSentence,wait;
+var muteGenerics; // v-added; not used in this file atm; applied in options.js during save
 var jumpWords;
 /**************************************/
 var profanityList=[];
@@ -34,11 +38,17 @@ var bwords=0;
 if(inSite("www.youtube",true)){
 	(document.body || document.documentElement).addEventListener('transitionend',filterVideoProfanities,true);
 	window.addEventListener('popstate',filterVideoProfanities,true);
+
+	// v-added; once each second, check if video-id needs updating
+	// (there are some cases of video-id changing that the regular listeners don't catch, and the video-id update-checking is very fast)
+	setInterval(()=>{
+		updateVideoID();
+	}, 1000);
 	
 	document.addEventListener('webkitfullscreenchange',correctShow,false);
-    document.addEventListener('mozfullscreenchange',correctShow,false);
-    document.addEventListener('fullscreenchange',correctShow,false);
-    document.addEventListener('MSFullscreenChange',correctShow,false);
+	document.addEventListener('mozfullscreenchange',correctShow,false);
+	document.addEventListener('fullscreenchange',correctShow,false);
+	document.addEventListener('MSFullscreenChange',correctShow,false);
 
 	if(inSite("www.youtube.*watch",false)){
 		filterYTSoundProfanities(true);
@@ -52,9 +62,9 @@ function correctShow(event){
 	
 	if(square!=null && square.style.display!="none"){
 		if(document.webkitIsFullScreen||document.mozFullScreen||document.msFullscreenElement){
-			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:56px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;");
+			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:56px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;" + squareStyleExtras);
 		}else{
-			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:37px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;");
+			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:37px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;" + squareStyleExtras);
 		}
 	}
 }
@@ -82,7 +92,22 @@ function filterVideoProfanities(event){
 	}
 }
 
-function directListenerFilter(){
+let directListenerFilter_timeout;
+function directListenerFilter(calledFromTimeout = false) {
+	// v-added
+	// if a timeout is already set, and this is an initial call
+	if (directListenerFilter_timeout != null && !calledFromTimeout) {
+		// then ignore this call (timeout will run momentarily)
+		return;
+	}
+	// if we cannot find the video element, then page must still be loading; try again in 500ms
+	if (document.getElementsByClassName('video-stream')[0] == null) {
+		directListenerFilter_timeout = setTimeout(()=>directListenerFilter(true), 500);
+		return;
+	}
+	clearTimeout(directListenerFilter_timeout);
+	directListenerFilter_timeout = null;
+
 	flgProcessed=false;
 	lastSite=thisSite;
 	resetListeners();
@@ -98,6 +123,7 @@ function directListenerFilter(){
 	resetStats();
 
 	var videoID = getParameterByName(thisSite,"v");
+	if (videoID == null) throw new Error(`Could not find video-id from url:${thisSite}`); // v-added
 	deleteIntervals();
 	showVideoQuery("",false)
 
@@ -109,7 +135,7 @@ function directListenerFilter(){
 						function(tempSplit,safeYTIndex){
 							drawIntervals(tempSplit,safeYTIndex,
 								function(tempSplit){
-									if(consoleOutput) console.log("[!] Star processing : "+toDecimals(parseFloat(videoControl.currentTime),2));
+									if(consoleOutput) console.log("[!] Start processing : "+toDecimals(parseFloat(videoControl.currentTime),2));
 
 									filter(tempSplit);
 								}
@@ -132,11 +158,30 @@ function filterYTSoundProfanities(execFlag){
 	if(filterLoop!==null) clearInterval(filterLoop);
 	ended=false;
 
-	var defaults = {'muteSentence': true, 'showCounter': true, 'consoleOutput': false,'delay': '-0.5','minWordsPerCategory':'2','wait': '1', 'profanityList': ['Damn','Bloody'],'exceptionList': ['arsenal','retardant'],'safeReplacement': ['[curse]','[heck]'],'safeWordsIndex': [0,0,0],'cycleTime':'1.5','beepTime':'1','jumpWords':false};
+	// todo: merge these defaults with data in restore_options() in options.js
+	var defaults = {
+		muteSentence: true,
+		muteGenerics: false,
+		showCounter: true,
+		consoleOutput: false,
+		delay: '-0.5',
+		minWordsPerCategory:'2',
+		wait: '1',
+		profanityList: ['Damn','Bloody'],
+		exceptionList: ['arsenal','retardant','butter'],
+		cycleTime:'1.5',
+		beepTime:'1',
+		jumpWords:false,
+
+		// todo: probably remove (I think these are never used; findSafeReplacement() seems to be used instead)
+		safeReplacement: ['[curse]','[heck]'],
+		safeWordsIndex: [0,0,0],
+	};
 
 	chrome.storage.sync.get(defaults, function(settings) {
 		consoleOutput = settings.consoleOutput;//
 		muteSentence = settings.muteSentence;//
+		muteGenerics = settings.muteGenerics;
 		jumpWords = settings.jumpWords;//
 		wait = toDecimals(parseFloat(settings.wait),2);//
 		delay = toDecimals(parseFloat(settings.delay),2);//
@@ -205,9 +250,9 @@ function drawIntervals(listToMute,safeYTIndex,callback){
 		left=toDecimals(listToMute[i][0]/duration,2)*100;
 		
 		if(isIn(i,safeYTIndex)){
-			square.setAttribute("style","position:absolute;left:"+left+"%;width:"+width+"%;height:100%;background-color:black;z-index:99;");
+			square.setAttribute("style","position:absolute;left:"+left+"%;width:"+width+"%;height:100%;background-color:black;z-index:99;" + squareStyleExtras);
 		}else{
-			square.setAttribute("style","position:absolute;left:"+left+"%;width:"+width+"%;height:100%;background-color:#8B0000;z-index:99;");
+			square.setAttribute("style","position:absolute;left:"+left+"%;width:"+width+"%;height:100%;background-color:#8B0000;z-index:99;" + squareStyleExtras);
 		}
 		progressBar.appendChild(square);
 	}
@@ -225,23 +270,24 @@ function isIn(index,testList){
 	return false;
 }
 
+// v-changed; cleaned up execution order
 function resetListeners(){
+	if (videoControl) {
+		videoControl.removeEventListener("pause", pauseYT);
+		videoControl.removeEventListener("play", playYT);
+		videoControl.removeEventListener("seeking",seekingYT);
+		videoControl.removeEventListener("seeked",seekedYT);
+		videoControl.removeEventListener("ended",endedYT);
+	}
+
 	videoControl=document.getElementsByClassName('video-stream')[0];
 	progressBar=document.getElementsByClassName('ytp-progress-list')[0];
 
-	/*******************************************************/
-	if(videoControl) videoControl.removeEventListener("pause", pauseYT);
-	if(videoControl) videoControl.removeEventListener("play", playYT);
-	if(videoControl) videoControl.removeEventListener("seeking",seekingYT);
-	if(videoControl) videoControl.removeEventListener("seeked",seekedYT);
-	if(videoControl) videoControl.removeEventListener("ended",endedYT);
-	/*******************************************************/
 	videoControl.addEventListener("pause", pauseYT);
 	videoControl.addEventListener("play", playYT);
 	videoControl.addEventListener("seeking",seekingYT);
 	videoControl.addEventListener("seeked",seekedYT);
 	videoControl.addEventListener("ended",endedYT);
-	/*******************************************************/
 }
 
 function resetStats(){
@@ -323,12 +369,21 @@ function pauseYT(){
 }
 
 function playYT(){
-	var playSite = getYTLocation();
 	paused=false;
 	playingTime=toDecimals(videoControl.currentTime,2);
+	
+	// v-replaced; the property used by old getYTLocation() function doesn't work anymore, so just refresh video-id from current URL 
+	/*var playSite = getYTLocation();
+	[...]*/
+	updateVideoID();
+}
 
-	if(getParameterByName(playSite,"v")!=getParameterByName(thisSite,"v")){
-		thisSite=playSite;
+function updateVideoID() {
+	const oldVideoID = getParameterByName(thisSite, "v");
+	const newSite = window.location.href;
+	const newVideoID = getParameterByName(newSite, "v");
+	if (newVideoID != oldVideoID && newVideoID != null){
+		thisSite = newSite;
 		/************************************/
 		doubleCheck=1;
 		directListenerFilter();
@@ -496,7 +551,37 @@ function getParameterByName(myLink,name){
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function getYouTubeCaptionURL(videoID,callback){
+async function getYouTubeCaptionURL(videoID,callback){
+
+	// v-added; fixed version of caption-retrieval that works with latest YouTube
+	let lang = "en";
+	if (true) {
+		//const data = document.body.innerHTML;
+		//const { data } = await fetch(`https://www.youtube.com/watch?v=${videoID}`);
+		const result = await fetch(`/watch?v=${videoID}`);
+		const data = await result.text();
+
+		// * ensure we have access to captions data
+		if (!data.includes('captionTracks')) throw new Error(`Could not find captions for video: ${videoID}`);
+	
+		const regex = /({"captionTracks":.*isTranslatable":(true|false)}])/;
+		const [match] = regex.exec(data);
+		const { captionTracks } = JSON.parse(`${match}}`);
+	
+		const subtitle = captionTracks.find(a=>a.vssId == `.${lang}`)
+			|| captionTracks.find(a=>a.vssId == `a.${lang}`)
+			|| captionTracks.find(a=>a.vssId && a.vssId.match(`.${lang}`));
+		// * ensure we have found the correct subtitle lang
+		if (!subtitle || (subtitle && !subtitle.baseUrl)) throw new Error(`Could not find ${lang} captions for ${videoID}`);
+
+		const lengthSeconds = Number(data.match(/"lengthSeconds":"(.+?)"/)[1]);
+		console.log("Length in seconds:", lengthSeconds);
+
+		//return subtitle.baseUrl;
+		callback(subtitle.baseUrl, lengthSeconds);
+		return;
+	}
+
 	var videoInfoURL = 'https://www.youtube.com/get_video_info?&video_id='+videoID;
 	var x = new XMLHttpRequest();
 	var way=0;
@@ -983,9 +1068,9 @@ function showVideoQuery(preDefault,keep){
 		square.id = 'videoMarkAYTP';
 		
 		if(document.webkitIsFullScreen||document.mozFullScreen||document.msFullscreenElement){
-			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:56px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;");
+			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:56px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;" + squareStyleExtras);
 		}else{
-			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:18px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;");
+			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:18px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;" + squareStyleExtras);
 		}
 	}
 
@@ -1129,15 +1214,20 @@ function inSite(charSite,update){
 		url = window.location;  //global variable
 		if(!url) url = window.location.href;
 		thisSite = url.toString();
+		console.log("Updated URL to:", thisSite);
 	}
 	var rege=new RegExp(charSite,'i');
 
 	return rege.test(thisSite);
 }
 
-function getYTLocation(){
+// v-replaced; the title-link no longer contains an href
+/*function getYTLocation(){
 	return document.getElementsByClassName('ytp-title-link')[0].href;
-}
+}*/
+/*function getVideoIDFromContainer() {
+	return document.getElementsByTagName("ytd-watch-flexy")[0].getAttribute("video-id");
+}*/
 
 function muteInstance(){
 	if(endMuteTime>=0){
