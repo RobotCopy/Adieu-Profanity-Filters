@@ -38,11 +38,17 @@ var bwords=0;
 if(inSite("www.youtube",true)){
 	(document.body || document.documentElement).addEventListener('transitionend',filterVideoProfanities,true);
 	window.addEventListener('popstate',filterVideoProfanities,true);
+
+	// v-added; once each second, check if video-id needs updating
+	// (there are some cases of video-id changing that the regular listeners don't catch, and the video-id update-checking is very fast)
+	setInterval(()=>{
+		updateVideoID();
+	}, 1000);
 	
 	document.addEventListener('webkitfullscreenchange',correctShow,false);
-    document.addEventListener('mozfullscreenchange',correctShow,false);
-    document.addEventListener('fullscreenchange',correctShow,false);
-    document.addEventListener('MSFullscreenChange',correctShow,false);
+	document.addEventListener('mozfullscreenchange',correctShow,false);
+	document.addEventListener('fullscreenchange',correctShow,false);
+	document.addEventListener('MSFullscreenChange',correctShow,false);
 
 	if(inSite("www.youtube.*watch",false)){
 		filterYTSoundProfanities(true);
@@ -86,7 +92,22 @@ function filterVideoProfanities(event){
 	}
 }
 
-function directListenerFilter(){
+let directListenerFilter_timeout;
+function directListenerFilter(calledFromTimeout = false) {
+	// v-added
+	// if a timeout is already set, and this is an initial call
+	if (directListenerFilter_timeout != null && !calledFromTimeout) {
+		// then ignore this call (timeout will run momentarily)
+		return;
+	}
+	// if we cannot find the video element, then page must still be loading; try again in 500ms
+	if (document.getElementsByClassName('video-stream')[0] == null) {
+		directListenerFilter_timeout = setTimeout(()=>directListenerFilter(true), 500);
+		return;
+	}
+	clearTimeout(directListenerFilter_timeout);
+	directListenerFilter_timeout = null;
+
 	flgProcessed=false;
 	lastSite=thisSite;
 	resetListeners();
@@ -102,6 +123,7 @@ function directListenerFilter(){
 	resetStats();
 
 	var videoID = getParameterByName(thisSite,"v");
+	if (videoID == null) throw new Error(`Could not find video-id from url:${thisSite}`); // v-added
 	deleteIntervals();
 	showVideoQuery("",false)
 
@@ -113,7 +135,7 @@ function directListenerFilter(){
 						function(tempSplit,safeYTIndex){
 							drawIntervals(tempSplit,safeYTIndex,
 								function(tempSplit){
-									if(consoleOutput) console.log("[!] Star processing : "+toDecimals(parseFloat(videoControl.currentTime),2));
+									if(consoleOutput) console.log("[!] Start processing : "+toDecimals(parseFloat(videoControl.currentTime),2));
 
 									filter(tempSplit);
 								}
@@ -248,23 +270,24 @@ function isIn(index,testList){
 	return false;
 }
 
+// v-changed; cleaned up execution order
 function resetListeners(){
+	if (videoControl) {
+		videoControl.removeEventListener("pause", pauseYT);
+		videoControl.removeEventListener("play", playYT);
+		videoControl.removeEventListener("seeking",seekingYT);
+		videoControl.removeEventListener("seeked",seekedYT);
+		videoControl.removeEventListener("ended",endedYT);
+	}
+
 	videoControl=document.getElementsByClassName('video-stream')[0];
 	progressBar=document.getElementsByClassName('ytp-progress-list')[0];
 
-	/*******************************************************/
-	if(videoControl) videoControl.removeEventListener("pause", pauseYT);
-	if(videoControl) videoControl.removeEventListener("play", playYT);
-	if(videoControl) videoControl.removeEventListener("seeking",seekingYT);
-	if(videoControl) videoControl.removeEventListener("seeked",seekedYT);
-	if(videoControl) videoControl.removeEventListener("ended",endedYT);
-	/*******************************************************/
 	videoControl.addEventListener("pause", pauseYT);
 	videoControl.addEventListener("play", playYT);
 	videoControl.addEventListener("seeking",seekingYT);
 	videoControl.addEventListener("seeked",seekedYT);
 	videoControl.addEventListener("ended",endedYT);
-	/*******************************************************/
 }
 
 function resetStats(){
@@ -346,12 +369,21 @@ function pauseYT(){
 }
 
 function playYT(){
-	var playSite = getYTLocation();
 	paused=false;
 	playingTime=toDecimals(videoControl.currentTime,2);
+	
+	// v-replaced; the property used by old getYTLocation() function doesn't work anymore, so just refresh video-id from current URL 
+	/*var playSite = getYTLocation();
+	[...]*/
+	updateVideoID();
+}
 
-	if(getParameterByName(playSite,"v")!=getParameterByName(thisSite,"v")){
-		thisSite=playSite;
+function updateVideoID() {
+	const oldVideoID = getParameterByName(thisSite, "v");
+	const newSite = window.location.href;
+	const newVideoID = getParameterByName(newSite, "v");
+	if (newVideoID != oldVideoID && newVideoID != null){
+		thisSite = newSite;
 		/************************************/
 		doubleCheck=1;
 		directListenerFilter();
@@ -519,13 +551,15 @@ function getParameterByName(myLink,name){
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function getYouTubeCaptionURL(videoID,callback){
+async function getYouTubeCaptionURL(videoID,callback){
 
-	// v-added
+	// v-added; fixed version of caption-retrieval that works with latest YouTube
 	let lang = "en";
 	if (true) {
-		//const { data } = await fetch(`https://youtube.com/watch?v=${videoID}`);
-		const data = document.body.innerHTML;
+		//const data = document.body.innerHTML;
+		//const { data } = await fetch(`https://www.youtube.com/watch?v=${videoID}`);
+		const result = await fetch(`/watch?v=${videoID}`);
+		const data = await result.text();
 
 		// * ensure we have access to captions data
 		if (!data.includes('captionTracks')) throw new Error(`Could not find captions for video: ${videoID}`);
@@ -1180,15 +1214,20 @@ function inSite(charSite,update){
 		url = window.location;  //global variable
 		if(!url) url = window.location.href;
 		thisSite = url.toString();
+		console.log("Updated URL to:", thisSite);
 	}
 	var rege=new RegExp(charSite,'i');
 
 	return rege.test(thisSite);
 }
 
-function getYTLocation(){
+// v-replaced; the title-link no longer contains an href
+/*function getYTLocation(){
 	return document.getElementsByClassName('ytp-title-link')[0].href;
-}
+}*/
+/*function getVideoIDFromContainer() {
+	return document.getElementsByTagName("ytd-watch-flexy")[0].getAttribute("video-id");
+}*/
 
 function muteInstance(){
 	if(endMuteTime>=0){

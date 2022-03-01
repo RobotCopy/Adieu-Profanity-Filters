@@ -389,7 +389,7 @@ function restore_options() {
 		"sexismNested":"biatch,whore,bitch,slut",
 		"racismNested":"",
 		"homophobiaNested":"maricon,faggot",
-		"explicitNested":"feck,masturbate,suck",
+		"explicitNested":"feck,masturbate",
 		"immodestyNested":"flaps",
 		"nudityNested":"gash,orto,beaver,clunge,cock,dick,knob,penis,prick,punani,pussy,twat",
 		"triumphalismNested":"",
