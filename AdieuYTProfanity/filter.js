@@ -1,6 +1,10 @@
+// v-added (along with several usages)
+const squareStyleExtras = "pointer-events:none;";
+
 // Default time options: (1.5,-0.75,2)<-(1.5,-1.5,0.75)
 var toMute,showCounter,consoleOutput,delay,minPerCategory;
 var cycleTime,muteSentence,wait;
+var muteGenerics; // v-added; not used in this file atm; applied in options.js during save
 var jumpWords;
 /**************************************/
 var profanityList=[];
@@ -52,9 +56,9 @@ function correctShow(event){
 	
 	if(square!=null && square.style.display!="none"){
 		if(document.webkitIsFullScreen||document.mozFullScreen||document.msFullscreenElement){
-			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:56px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;");
+			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:56px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;" + squareStyleExtras);
 		}else{
-			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:37px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;");
+			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:37px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;" + squareStyleExtras);
 		}
 	}
 }
@@ -132,11 +136,30 @@ function filterYTSoundProfanities(execFlag){
 	if(filterLoop!==null) clearInterval(filterLoop);
 	ended=false;
 
-	var defaults = {'muteSentence': true, 'showCounter': true, 'consoleOutput': false,'delay': '-0.5','minWordsPerCategory':'2','wait': '1', 'profanityList': ['Damn','Bloody'],'exceptionList': ['arsenal','retardant'],'safeReplacement': ['[curse]','[heck]'],'safeWordsIndex': [0,0,0],'cycleTime':'1.5','beepTime':'1','jumpWords':false};
+	// todo: merge these defaults with data in restore_options() in options.js
+	var defaults = {
+		muteSentence: true,
+		muteGenerics: false,
+		showCounter: true,
+		consoleOutput: false,
+		delay: '-0.5',
+		minWordsPerCategory:'2',
+		wait: '1',
+		profanityList: ['Damn','Bloody'],
+		exceptionList: ['arsenal','retardant','butter'],
+		cycleTime:'1.5',
+		beepTime:'1',
+		jumpWords:false,
+
+		// todo: probably remove (I think these are never used; findSafeReplacement() seems to be used instead)
+		safeReplacement: ['[curse]','[heck]'],
+		safeWordsIndex: [0,0,0],
+	};
 
 	chrome.storage.sync.get(defaults, function(settings) {
 		consoleOutput = settings.consoleOutput;//
 		muteSentence = settings.muteSentence;//
+		muteGenerics = settings.muteGenerics;
 		jumpWords = settings.jumpWords;//
 		wait = toDecimals(parseFloat(settings.wait),2);//
 		delay = toDecimals(parseFloat(settings.delay),2);//
@@ -205,9 +228,9 @@ function drawIntervals(listToMute,safeYTIndex,callback){
 		left=toDecimals(listToMute[i][0]/duration,2)*100;
 		
 		if(isIn(i,safeYTIndex)){
-			square.setAttribute("style","position:absolute;left:"+left+"%;width:"+width+"%;height:100%;background-color:black;z-index:99;");
+			square.setAttribute("style","position:absolute;left:"+left+"%;width:"+width+"%;height:100%;background-color:black;z-index:99;" + squareStyleExtras);
 		}else{
-			square.setAttribute("style","position:absolute;left:"+left+"%;width:"+width+"%;height:100%;background-color:#8B0000;z-index:99;");
+			square.setAttribute("style","position:absolute;left:"+left+"%;width:"+width+"%;height:100%;background-color:#8B0000;z-index:99;" + squareStyleExtras);
 		}
 		progressBar.appendChild(square);
 	}
@@ -497,6 +520,34 @@ function getParameterByName(myLink,name){
 }
 
 function getYouTubeCaptionURL(videoID,callback){
+
+	// v-added
+	let lang = "en";
+	if (true) {
+		//const { data } = await fetch(`https://youtube.com/watch?v=${videoID}`);
+		const data = document.body.innerHTML;
+
+		// * ensure we have access to captions data
+		if (!data.includes('captionTracks')) throw new Error(`Could not find captions for video: ${videoID}`);
+	
+		const regex = /({"captionTracks":.*isTranslatable":(true|false)}])/;
+		const [match] = regex.exec(data);
+		const { captionTracks } = JSON.parse(`${match}}`);
+	
+		const subtitle = captionTracks.find(a=>a.vssId == `.${lang}`)
+			|| captionTracks.find(a=>a.vssId == `a.${lang}`)
+			|| captionTracks.find(a=>a.vssId && a.vssId.match(`.${lang}`));
+		// * ensure we have found the correct subtitle lang
+		if (!subtitle || (subtitle && !subtitle.baseUrl)) throw new Error(`Could not find ${lang} captions for ${videoID}`);
+
+		const lengthSeconds = Number(data.match(/"lengthSeconds":"(.+?)"/)[1]);
+		console.log("Length in seconds:", lengthSeconds);
+
+		//return subtitle.baseUrl;
+		callback(subtitle.baseUrl, lengthSeconds);
+		return;
+	}
+
 	var videoInfoURL = 'https://www.youtube.com/get_video_info?&video_id='+videoID;
 	var x = new XMLHttpRequest();
 	var way=0;
@@ -983,9 +1034,9 @@ function showVideoQuery(preDefault,keep){
 		square.id = 'videoMarkAYTP';
 		
 		if(document.webkitIsFullScreen||document.mozFullScreen||document.msFullscreenElement){
-			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:56px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;");
+			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:56px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;" + squareStyleExtras);
 		}else{
-			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:18px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;");
+			square.setAttribute("style","color:#eee;margin:2% 30% 0 35%;position:absolute;bottom:0;z-index:99;height:18px;width:40%;text-align:center;text-shadow:black 0.1em 0.1em 0.2em;" + squareStyleExtras);
 		}
 	}
 

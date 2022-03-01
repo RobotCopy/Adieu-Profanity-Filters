@@ -23,6 +23,12 @@ var profanityCategories=[
 		["bullying",14]
 	]
 ];
+// v-moved
+function findSafeReplacement(){
+	//return ["[tolerance]","[discriminatory]","[threat]","[tolerance]","[discriminatory]","[discriminatory]","[discriminatory]","[sex]","[sex]","[nudity]","[discriminatory]","[discriminatory]","[discriminatory]","[antisocial]","[violence]","[substances]"];
+
+	return ["[curse]","[humiliating]","[degrading]","[blasphemy]","[sexism]","[racism]","[homophobia]","[explicit]","[immodesty]","[nudity]","[triumphalism]","[elitism]","[arrogance]","[isolationism]","[bullying]","[drugs]","{YT}"];
+}
 
 function generateExceptionList(){
 	var x, isExtreme, exceptionList=[],wordListEx=[];
@@ -35,37 +41,44 @@ function generateExceptionList(){
 	return exceptionList;
 }
 
-function generateProfanityList(){
-	var x, y, i, profanityList=[], wordListComplete=[], wordListNested=[];
+function generateProfanityList(muteGenerics){
+	var profanityList=[];
 	//wordListComplete = document.getElementById('wordListComplete').value.split(',');
 	//wordListNested = document.getElementById('wordListNested').value.split(',');
 	//var wlc=wordListComplete.length;
 	//var wn=wordListNested.length;
 
-	for(i=0;i<profanityCategories.length;i++){
-		for(x=0;x<profanityCategories[i].length;x++){
-			wordListComplete=getByIdSplit(profanityCategories[i][x][0]+"Complete");
-			for(y=0;y<wordListComplete.length;y++){
-				profanityList.push('\\b(' + wordListComplete[y][0] + ')' + wordListComplete[y].substring(1) + '(e?[sdr][ys]?|ing?|py)?\\b'); 
+	// v-changed
+	for(const severityGroup of profanityCategories){
+		for(const [name, safeReplaceIndex] of severityGroup){
+			wordListComplete=getByIdSplit(name+"Complete");
+			for(const word of wordListComplete){
+				profanityList.push('\\b(' + word[0] + ')' + word.substring(1) + '(e?[sdr][ys]?|ing?|py)?\\b'); 
 			}
 		}
 	}
 
-	for(i=0;i<profanityCategories.length;i++){
-		for(x=0;x<profanityCategories[i].length;x++){
-			wordListNested=getByIdSplit(profanityCategories[i][x][0]+"Nested");
-			for(y=0;y<wordListNested.length;y++){
-				profanityList.push('\\b(\\w?)\\w*(' + wordListNested[y][0] + ')' + wordListNested[y].substring(1)+"\\w*\\b");
+	// v-changed
+	for(const severityGroup of profanityCategories){
+		for(const [name, safeReplaceIndex] of severityGroup){
+			wordListNested=getByIdSplit(name+"Nested");
+			for(const word of wordListNested){
+				profanityList.push('\\b(\\w?)\\w*(' + word[0] + ')' + word.substring(1) + "\\w*\\b");
 			}
 		}
 	}
+
+	// new youtube subtitles replaces most profanity with "__", so count that as a match
+	profanityList.push("\\[\\s*__\\s*\\]");
 
 	// Check that "findSafeWord" have the same words
-	profanityList.push("\\[\\s*bleep\\s*\\]");
-	profanityList.push("\\[\\s*applause\\s*\\]");
-	profanityList.push("\\[\\s*music\\s*\\]");
-	profanityList.push("\\[\\s*laughter\\s*\\]");
-	profanityList.push("\\[\\s*cheers\\sand\\sapplause\\s*\\]");
+	if (muteGenerics) { // v-added
+		profanityList.push("\\[\\s*bleep\\s*\\]");
+		profanityList.push("\\[\\s*applause\\s*\\]");
+		profanityList.push("\\[\\s*music\\s*\\]");
+		profanityList.push("\\[\\s*laughter\\s*\\]");
+		profanityList.push("\\[\\s*cheers\\sand\\sapplause\\s*\\]");
+	}
 
 	return profanityList;
 }
@@ -151,12 +164,6 @@ function MakeExtreme(wordList){
 		wordList[x]=tmpString;
 	}
 	return wordList;
-}
-
-function findSafeReplacement(){
-	//return ["[tolerance]","[discriminatory]","[threat]","[tolerance]","[discriminatory]","[discriminatory]","[discriminatory]","[sex]","[sex]","[nudity]","[discriminatory]","[discriminatory]","[discriminatory]","[antisocial]","[violence]","[substances]"];
-
-	return ["[curse]","[humiliating]","[degrading]","[blasphemy]","[sexism]","[racism]","[homophobia]","[explicit]","[immodesty]","[nudity]","[triumphalism]","[elitism]","[arrogance]","[isolationism]","[bullying]","[drugs]","{YT}"];
 }
 
 function findSafeWord(){
@@ -252,6 +259,7 @@ function save_options(){
 	//settings.filterExtreme = document.getElementById('filterExtreme').checked;
 	settings.toMute = document.getElementById('toMute').checked;
 	settings.muteSentence = document.getElementById('muteSentence').checked;
+	settings.muteGenerics = document.getElementById('muteGenerics').checked;
 	settings.delay = document.getElementById('delay').value;
 
 	settings.minWordsPerCategory = document.getElementById('minWordsPerCategory').value;
@@ -262,7 +270,7 @@ function save_options(){
 	settings.wait = document.getElementById('wait').value;
 
 	settings.safeWordsIndex = findSafeWord();
-	settings.profanityList = generateProfanityList();
+	settings.profanityList = generateProfanityList(settings.muteGenerics);
 	settings.exceptionList = generateExceptionList();
 	settings.safeReplacement = findSafeReplacement();
 
@@ -356,15 +364,46 @@ function toggleProfanity() {
 function restore_options() {
 	var defaults = {
 		//Complete
-		"curseComplete":"bloody,xxx","humiliatingComplete":"ahole","degradingComplete":"caca﻿,bullshit,anus,arse,ass,butt,clusterfuck,motherfuck,bumblefuck,sht,dipshit","blasphemyComplete":"chrissake﻿,goddam,hell,dammit,chrissake","sexismComplete":"clit,cunt,oldbag,tart,puto,puta,hoor,hoore,hore","racismComplete":"whitetrash,nigger,nigga,beaner,spic,gooback,sandmonkey","homophobiaComplete":"fag,queer,homo,faggot,gay,poofster,fags,maricon","explicitComplete":"jism,jiss,jizm,piss,cum,jizz,semen","immodestyComplete":"fuck,fellatio,suka,blowjob,handjob,wank","nudityComplete":"peeenus,peeenusss,peenus,peinus,penus,penuus,vulva,bollocks,dildo,pecker,penis,tits,vag","triumphalismComplete":"","elitismComplete":"bugger,minge","arroganceComplete":"huevon,dickhead,dumbass","isolationismComplete":"","bullyingComplete":"arsehole,carpetmuncher,garbage","drugsComplete":"cocaine,crack,ecstasy,methamphetamine,meth,heroin,mandrax,lsd",
+		"curseComplete":"bloody,xxx",
+		"humiliatingComplete":"ahole",
+		"degradingComplete":"caca﻿,bullshit,anus,arse,ass,butt,clusterfuck,motherfuck,bumblefuck,sht,dipshit",
+		"blasphemyComplete":"chrissake﻿,goddam,hell,dammit,chrissake",
+		"sexismComplete":"clit,cunt,oldbag,tart,puto,puta,hoor,hoore,hore",
+		"racismComplete":"whitetrash,nigger,nigga,beaner,spic,gooback,sandmonkey",
+		"homophobiaComplete":"fag,queer,homo,faggot,gay,poofster,fags,maricon",
+		"explicitComplete":"jism,jiss,jizm,piss,cum,jizz,semen",
+		"immodestyComplete":"fuck,fellatio,suka,blowjob,handjob,wank",
+		"nudityComplete":"peeenus,peeenusss,peenus,peinus,penus,penuus,vulva,bollocks,dildo,pecker,penis,tits,vag",
+		"triumphalismComplete":"",
+		"elitismComplete":"bugger,minge",
+		"arroganceComplete":"huevon,dickhead,dumbass",
+		"isolationismComplete":"",
+		"bullyingComplete":"arsehole,carpetmuncher,garbage",
+		"drugsComplete":"cocaine,crack,ecstasy,methamphetamine,meth,heroin,mandrax,lsd",
 		
 		//Nested
-		"curseNested":"snatch,beastiality","humiliatingNested":"asshat,asshole,butthole","degradingNested":"crap,diarrhea,merdaputo,mierda,shit","blasphemyNested":"damn","sexismNested":"biatch,whore,bitch,slut","racismNested":"","homophobiaNested":"maricon,faggot","explicitNested":"feck,masturbate,suck","immodestyNested":"flaps","nudityNested":"gash,orto,beaver,clunge,cock,dick,knob,penis,prick,punani,pussy,twat","triumphalismNested":"","elitismNested":"hijueputa,lameass,lardass,pinche,fanny","arroganceNested":"","isolationismNested":"bastard,minge","bullyingNested":"carajo","drugsNested":"",
+		"curseNested":"snatch,beastiality",
+		"humiliatingNested":"asshat,asshole,butthole",
+		"degradingNested":"crap,diarrhea,merdaputo,mierda,shit",
+		"blasphemyNested":"damn",
+		"sexismNested":"biatch,whore,bitch,slut",
+		"racismNested":"",
+		"homophobiaNested":"maricon,faggot",
+		"explicitNested":"feck,masturbate,suck",
+		"immodestyNested":"flaps",
+		"nudityNested":"gash,orto,beaver,clunge,cock,dick,knob,penis,prick,punani,pussy,twat",
+		"triumphalismNested":"",
+		"elitismNested":"hijueputa,lameass,lardass,pinche,fanny",
+		"arroganceNested":"",
+		"isolationismNested":"bastard,minge",
+		"bullyingNested":"carajo",
+		"drugsNested":"",
 
 		//'wordListComplete': 'bloody,minger',
 		//'wordListNested': 'arse,retard', 
-		'wordListExceptions': 'arsenal,retardant' ,
+		'wordListExceptions': 'arsenal,retardant,butter', // v-changed (added some more exceptions)
 		'muteSentence': true, 
+		'muteGenerics': false, // v-added (old behavior equated to true) 
 		'toMute': false, 
 		'showCounter': true, 
 		'consoleOutput': false,
@@ -470,6 +509,7 @@ function restore_options() {
 		//document.getElementById('filterExtreme').checked = settings.filterExtreme;
 		document.getElementById('toMute').checked = settings.toMute;
 		document.getElementById('muteSentence').checked = settings.muteSentence;
+		document.getElementById('muteGenerics').checked = settings.muteGenerics;
 		document.getElementById('delay').value = settings.delay;
 		document.getElementById('wait').value = settings.wait;
 
@@ -490,6 +530,7 @@ document.getElementById('save').addEventListener('click',save_options);
 document.getElementById('beepTime').addEventListener('change',save_options);
 document.getElementById('toMute').addEventListener('click',save_options);
 document.getElementById('muteSentence').addEventListener('click',save_options);
+document.getElementById('muteGenerics').addEventListener('click',save_options);
 document.getElementById('delay').addEventListener('change',save_options);
 
 document.getElementById('minWordsPerCategory').addEventListener('change',save_options);
